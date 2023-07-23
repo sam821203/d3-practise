@@ -1,7 +1,7 @@
 /*
 *    main.js
 *    Mastering Data Visualization with D3.js
-*    3.10 - Axes and labels
+*    3.11 - Making a bar chart
 */
 
 const MARGIN = { LEFT: 100, RIGHT: 10, TOP: 10, BOTTOM: 130 }
@@ -44,10 +44,10 @@ d3.json("data/buildings.json").then(data => {
     .range([0, WIDTH])
     .paddingInner(0.3)
     .paddingOuter(0.2)
-  
+
   const y = d3.scaleLinear()
     .domain([0, d3.max(data, d => d.height)])
-    .range([0, HEIGHT])
+    .range([HEIGHT, 0])
 
   const xAxisCall = d3.axisBottom(x)
   g.append("g")
@@ -55,10 +55,10 @@ d3.json("data/buildings.json").then(data => {
     .attr("transform", `translate(0, ${HEIGHT})`)
     .call(xAxisCall)
     .selectAll("text")
-      .attr("y", "10")
-      .attr("x", "-5")
-      .attr("text-anchor", "end")
-      .attr("transform", "rotate(-40)")
+    .attr("y", "10")
+    .attr("x", "-5")
+    .attr("text-anchor", "end")
+    .attr("transform", "rotate(-40)")
 
   const yAxisCall = d3.axisLeft(y)
     .ticks(3)
@@ -69,11 +69,11 @@ d3.json("data/buildings.json").then(data => {
 
   const rects = g.selectAll("rect")
     .data(data)
-  
+
   rects.enter().append("rect")
-    .attr("y", 0)
+    .attr("y", d => y(d.height))
     .attr("x", (d) => x(d.name))
     .attr("width", x.bandwidth)
-    .attr("height", d => y(d.height))
+    .attr("height", d => HEIGHT - y(d.height))
     .attr("fill", "grey")
 })
