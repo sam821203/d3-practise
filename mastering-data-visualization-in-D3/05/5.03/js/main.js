@@ -34,6 +34,13 @@ g.append("text")
   .attr("transform", "rotate(-90)")
   .text("Revenue ($)")
 
+const xAxisGroup = g.append("g")
+  .attr("class", "x axis")
+  .attr("transform", `translate(0, ${HEIGHT})`)
+
+const yAxisGroup = g.append("g")
+  .attr("class", "y axis")
+
 const x = d3.scaleBand()
   .range([0, WIDTH])
   .paddingInner(0.3)
@@ -41,13 +48,6 @@ const x = d3.scaleBand()
 
 const y = d3.scaleLinear()
   .range([HEIGHT, 0])
-
-const xAxisGroup = g.append("g")
-  .attr("class", "x axis")
-  .attr("transform", `translate(0, ${HEIGHT})`)
-
-const yAxisGroup = g.append("g")
-  .attr("class", "y axis")
 
 d3.csv("data/revenues.csv").then(data => {
   data.forEach(d => {
@@ -66,21 +66,23 @@ function update(data) {
   y.domain([0, d3.max(data, d => d.revenue)])
 
   const xAxisCall = d3.axisBottom(x)
+
   xAxisGroup.call(xAxisCall)
     .selectAll("text")
-      .attr("y", "10")
-      .attr("x", "-5")
-      .attr("text-anchor", "end")
-      .attr("transform", "rotate(-40)")
+    .attr("y", "10")
+    .attr("x", "-5")
+    .attr("text-anchor", "end")
+    .attr("transform", "rotate(-40)")
 
   const yAxisCall = d3.axisLeft(y)
     .ticks(3)
     .tickFormat(d => d + "m")
+
   yAxisGroup.call(yAxisCall)
 
   // const rects = g.selectAll("rect")
   //   .data(data)
-  
+
   // rects.enter().append("rect")
   //   .attr("y", d => y(d.revenue))
   //   .attr("x", (d) => x(d.month))

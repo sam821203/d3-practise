@@ -44,7 +44,7 @@ d3.csv("data/revenues.csv").then(data => {
     .range([0, WIDTH])
     .paddingInner(0.3)
     .paddingOuter(0.2)
-  
+
   const y = d3.scaleLinear()
     .domain([0, d3.max(data, d => d.revenue)])
     .range([HEIGHT, 0])
@@ -55,10 +55,10 @@ d3.csv("data/revenues.csv").then(data => {
     .attr("transform", `translate(0, ${HEIGHT})`)
     .call(xAxisCall)
     .selectAll("text")
-      .attr("y", "10")
-      .attr("x", "-5")
-      .attr("text-anchor", "end")
-      .attr("transform", "rotate(-40)")
+    .attr("y", "10")
+    .attr("x", "-5")
+    .attr("text-anchor", "end")
+    .attr("transform", "rotate(-40)")
 
   const yAxisCall = d3.axisLeft(y)
     .ticks(3)
@@ -69,7 +69,7 @@ d3.csv("data/revenues.csv").then(data => {
 
   const rects = g.selectAll("rect")
     .data(data)
-  
+
   rects.enter().append("rect")
     .attr("y", d => y(d.revenue))
     .attr("x", (d) => x(d.month))
@@ -78,6 +78,6 @@ d3.csv("data/revenues.csv").then(data => {
     .attr("fill", "grey")
 
   d3.interval(() => {
-    console.log("Hello World")
+    console.log("Hello World!");
   }, 1000)
 })
