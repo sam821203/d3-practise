@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Document</title>
+    </head>
+    <body>
+        <p class="enterData">data</p>
+        <p class="enterData">data</p>
+
+        <svg width="400" height="200" style="border:1px solid tomato">
+            <rect
+                x="25"
+                y="30"
+                width="300"
+                height="100"
+                style="fill:rgb(0, 195, 255); stroke-width:3; stroke:rgb(0,0,0)"
+            />
+        </svg>
+        <svg width="400" height="150" style="border:1px solid tomato">
+            <circle cx="100" cy="50" r="40" stroke="black" stroke-width="3" fill="red" />
+        </svg>
+
+        <svg width="400" height="150" style="border:1px solid tomato">
+            <ellipse cx="200" cy="80" rx="80" ry="50" stroke="black" stroke-width="3" fill="pink"></ellipse>
+        </svg>
+        <svg width="400" height="200" style="border:1px solid tomato">
+            <line x1="0" y1="0" x2="200" y2="200" style="stroke:rgb(0,0,255); stroke-width:2" />
+        </svg>
+        <svg width="400" height="200" style="border:1px solid tomato">
+            <polyline
+                points="20,50 40,25 60,40 80,120 120,140 160,180 "
+                style="fill: none; stroke: orangered; stroke-width: 3"
+            />
+        </svg>
+        <svg width="400" height="200" style="border:1px solid tomato">
+            <polygon points="200,10 250,190 160,180" style="fill: lime; stroke: purple; stroke-width: 1" />
+        </svg>
+        <svg class="svg1" width="500" height="300" style="border:1px solid tomato">
+            <circle></circle>
+        </svg>
+
+        <script src="https://d3js.org/d3.v5.min.js"></script>
+
+        <script>
+            d3.select('.svg1 circle')
+              .attr("r", 10)
+              .attr("fill", "blue")
+              .attr("cx", 50)
+              .attr("cy", 50)
+              .attr("transform", "translate(40,40)");
+
+            const enterData = ["資", "料", "比", "較", "多"];
+            const eData = d3.selectAll('.enterData')
+              .data(enterData)
+              .enter()
+              .append('p')
+              .attr('class', 'enterData')
+
+            const cors = "https://secret-ocean-49799.herokuapp.com/";
+            const url = "https://ws.hsinchu.gov.tw/001/Upload/1/opendata/8774/1380/af80d954-d968-42a0-bc97-a2f801840b65.json";
+
+            const getCorsData = async () => {
+              const dataGet = await d3.json(`${cors}${url}`)
+
+              console.log('dataGet', dataGet);
+            }
+
+            getCorsData();
+        </script>
+    </body>
+</html>
