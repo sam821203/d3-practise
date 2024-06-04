@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Document</title>
+    </head>
+    <body>
+        <svg class="stack" style="border:1px solid skyblue"></svg>
+
+        <script src="https://d3js.org/d3.v7.min.js"></script>
+        <script>
+            const dataStack = [
+              {month: new Date(2021, 0, 1), China: 32, America: 20, Taiwan: 30},
+              {month: new Date(2021, 1, 1), China: 7, America: 27, Taiwan: 18},
+              {month: new Date(2021, 2, 1), China: 13, America: 33, Taiwan: 18},
+              {month: new Date(2021, 3, 1), China: 6, America: 18, Taiwan: 20}
+            ];
+
+            const stack = d3.stack()
+              .keys(['China', 'America', 'Taiwan']) // 設定資料的keys
+
+            const stackedSeries = stack(dataStack) // 把資料帶入stack方法
+
+            // 顏色
+            const colorScale = d3.scaleOrdinal()
+              .domain(['China', 'America', 'Taiwan'])
+              .range(['red', 'blue', 'orange'])
+
+            // 建立集合元素g、設定顏色
+            const g = d3.select('.stack')
+              .attr('width', 300)
+              .selectAll('g')
+              .data(stackedSeries)
+              .enter()
+              .append('g')
+              .attr('fill', d => colorScale(d.key))
+
+            // 繪製長條圖
+            g.selectAll('rect')
+              .data(d => d)
+              .join('rect')
+              .attr('width', d => d[1] - d[0]) // 長度為終點值減掉起始值
+              .attr('x', d => d[0]) // x 座標設定為起始值
+              .attr('y', (d, i) => i * 30) // y座標用 index 來處理，乘上每條 bar 想拉開的距離
+              .attr('height', 20)
+        </script>
+    </body>
+</html>

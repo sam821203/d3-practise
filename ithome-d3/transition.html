@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Document</title>
+    </head>
+    <body>
+        <svg class="move"></svg>
+        <button type="button" class="move-btn">移動</button>
+
+        <svg class="changeColor"></svg>
+        <button type="button" class="changeBtn">改變顏色</button>
+
+        <svg class="delay"></svg>
+        <button type="button" class="delayBtn">delay開始</button>
+
+        <svg class="ease"></svg>
+        <select name="ease" id="ease">
+            <option value=""></option>
+        </select>
+        <button type="button" class=easeBtn" onClick="updateEase();">Ease開始</button>
+
+        <svg class="loopAnimation"></svg>
+
+        <div class="chartContainer"></div>
+        <button type="button" id="start" class="btn btn-primary">動畫開始</button>
+
+        <script src="https://d3js.org/d3.v7.min.js"></script>
+
+        <script>
+            // 方塊大小
+            const rect = d3.select('.move')
+              .append('rect')
+              .attr('width', 40)
+              .attr('height', 40)
+              .attr('stroke', 'skyblue')
+
+            // 移動是件觸發
+            document.querySelector('.move-btn').addEventListener('click', function() {
+              rect.transition()
+                .duration(2000) // 設定動畫時間持續2秒鐘
+                .attr('transform', 'translate(140, 60)')
+            })
+
+            const round = d3.select('.changeColor')
+              .append('circle')
+              .attr('cx', 100)
+              .attr('cy', 50)
+              .attr('r', 25)
+              .attr('fill', 'orange')
+              .attr('stroke-width', '0.5px')
+              .attr('stroke', 'black')
+
+            // 想加上動畫的項目一定要放在 transition( ) 之後，如果放在 transition( ) 之前的話，就無法綁定動畫效果
+            document.querySelector('.changeBtn').addEventListener('click', function() {
+              round.transition()
+                .duration(1000)
+                .attr('fill', 'green')
+                .attr('stroke-width', '6px')
+                .attr('stroke', 'red')
+            })
+
+            // .delay( ) 動畫延遲 =================================
+            const dataDelay = [160, 140, 120, 100, 80, 60 ,40 ,20]
+
+            const delay = d3.select('.delay')
+              .selectAll('circle')
+              .data(dataDelay)
+              .enter()
+              .append('circle')
+              .attr('cx', d => d)
+              .attr('cy', 30)
+              .attr('r', 15)
+              .attr('fill', 'skyblue')
+              .attr('opacity', '0.5')
+
+            document.querySelector('.delayBtn').addEventListener('click', function(){
+              delay.transition()
+                  .delay((d, i) => i * 200) // 分別延遲
+                  .attr('cx', d => d + 120) // 位移距離
+            })
+
+            // .ease( ) 動畫效果 =================================
+            const easeNames = Object.keys(d3).filter((d) => {
+              return d.slice(0, 4) === 'ease' // 抓出所有方法中，名稱內有ease的方法
+            })
+
+            d3.select('#ease')
+              .selectAll('option')
+              .data(easeNames)
+              .join('option')
+              .attr('value', function(d) {
+                return d;
+              })
+              .text(function(d) {
+                return 'd3.' + d
+              })
+
+            const easeDot = d3.select('.ease')
+              .append('circle')
+              .attr('cx', 40)
+              .attr('cy', 40)
+              .attr('r', 30)
+              .attr('fill', 'skyblue')
+
+            const updateEase = () => {
+              let easeName = d3.select('#ease').node().value;
+
+              console.log('easeName:', easeName);
+              easeDot.attr('cx', 40) // 回原點
+                .transition()
+                .ease(d3[easeName]) // 設定動畫效果
+                .attr('cx', 200)
+            }
+
+            // transition.on( ) 動畫的生命週期 =================================
+            function goLeft () {
+              d3.active(this)
+                .attr('cx', 50)
+                .transition()
+                .on('start', goRight)
+            }
+
+            function goRight () {
+              d3.active(this)
+                .attr('cx', 200)
+                .transition()
+                .on('start', goLeft)
+            }
+
+            const loop = d3.select('.loopAnimation')
+              .append('circle')
+              .attr('cx', 50)
+              .attr('cy', 50)
+              .attr('r', 25)
+              .attr('fill', 'skyblue')
+              .transition()
+              .duration(2000)
+              .on('start', goRight)
+
+            // 完整圖表動畫 =================================
+            // 定義兩個資料，都是Y值，x值就用陣列索引即可
+            let data1 = [150, 122, 133, 161, 116, 139, 143, 115, 193, 137, 122, 141];
+            let data2 = [180, 146, 180, 172, 133, 149, 152, 138, 188, 192, 117, 146];
+            let n = data1.length, //資料點的數量
+                mx = d3.max(d3.merge([data1, data2])) //抓兩個陣列的最大值
+
+            const chartContainer = d3.select('.chartContainer').append('svg');
+
+            chartContainer
+              .attr('width', 500)
+              .attr('heigth', 300)
+
+            chartContainer
+              .selectAll('rect')
+              .data(data1)
+              .enter()
+              .append('rect')
+              .attr('x', 0)
+              .attr('y', (d, i) => i * 30)
+              .attr('width', (d, i) => d)
+              .attr('height', 20)
+              .attr('fill', 'tomato')
+            
+            // 動畫開始
+            d3.select('#start')
+              .on('click', function() {
+                chartContainer.selectAll('rect')
+                  .data(data2) // 資料變化
+                  .transition()
+                  .duration(1000) // 點擊後，每個 bar 會在 1 秒內到達更新位置
+                  .delay((d, i) => 200 * i) // 每個 bar 在分別 delay 後才開始動畫
+                  .attr('width', (d, i) => d)
+                  .attr('fill', 'skyblue')
+              })
+
+        </script>
+    </body>
+</html>
