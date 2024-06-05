@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <div class="chartContainer">
+      <div class="box1">
+        <p>aa</p>
+        <p>aa</p>
+        <p>aa</p>
+        <p>aa</p>
+      </div>
+    </div>
+
+    <h5>3. pointer()找出目前滑鼠所在 X Y 軸座標</h5>
+    <div class="position"></div>
+
+    <div class="combined" style="border: 1px solid tomato"></div>
+
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+
+    <script>
+      // hover (mouseover / mouseleave) =================================================================
+      d3.selectAll("p")
+        .on("mouseover", function () {
+          d3.select(this)
+            .style("color", "red")
+            .transition()
+            .style("cursor", "pointer")
+            .style("transform", "translate(50px)");
+        })
+        .on("mouseleave", function () {
+          d3.select(this)
+            .style("color", "black")
+            .transition()
+            .style("transform", "translate(0)");
+        });
+
+      // d3.pointer(事件, target) =================================================================
+      const svg = d3.select(".position").append("svg");
+      let txt = svg.append("text");
+
+      // 先建立 svg 並設定大小
+      svg.attr("width", 500).attr("height", 500);
+
+      // 設定 svg 滑鼠事件
+      svg.on("mousemove", function () {
+        let pt = d3.pointer(event, svg.node());
+
+        txt
+          .attr("x", pt[0])
+          .attr("y", pt[1])
+          .text(`X: ${parseInt(pt[0])} | Y: ${parseInt(pt[1])}`);
+        console.log(pt);
+      });
+
+      // 結合範例 =================================================================
+      const data = [130, 210, 90, 250];
+      const combined = d3
+        .select(".combined")
+        .append("svg")
+        .attr("width", 500)
+        .attr("height", 300);
+
+      const dots = combined
+        .selectAll("circle")
+        .data(data)
+        .enter()
+        .append("circle")
+        .attr("cx", (d) => d)
+        .attr("cy", (d, i) => (i + 1) * 60)
+        .attr("r", "15")
+        .attr("fill", "blue")
+        .attr("cursor", "pointer");
+
+      // 綁定事件
+      dots.on("mouseover", function () {
+        let pt = d3.pointer(event, event.target);
+
+        d3.select(this)
+          .attr("fill", "red")
+          .transition()
+          .attr("cx", pt[0] + 100);
+      });
+    </script>
+  </body>
+</html>

@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <div class="tooltip2" style="border: 1px solid tomato"></div>
+
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <script>
+      // Tooltips 進階應用 =================================================================
+      const tooltipsData = [
+        { r: 17, x: 134, y: 181, color: "red" },
+        { r: 23, x: 294, y: 131, color: "yellow" },
+        { r: 14, x: 84, y: 273, color: "orange" },
+        { r: 9, x: 323, y: 59, color: "blue" },
+        { r: 18, x: 172, y: 251, color: "green" },
+        { r: 26, x: 404, y: 154, color: "pink" },
+      ];
+
+      // 將資料轉成圓點點
+      d3.select(".tooltip2").style("position", "relative");
+
+      const dots = d3
+        .select(".tooltip2")
+        .append("svg")
+        .attr("width", 500)
+        .attr("height", 300)
+        .selectAll("circle")
+        .data(tooltipsData)
+        .enter()
+        .append("circle")
+        .attr("r", (d) => d.r)
+        .attr("cx", (d) => d.x)
+        .attr("cy", (d) => d.y)
+        .attr("fill", (d) => d.color)
+        .style("cursor", "pointer");
+
+      // 建立tooltips
+      const tooltips = d3
+        .select(".tooltip2")
+        .append("div")
+        .style("opacity", 0)
+        .style("position", "absolute")
+        .attr("class", "tooltip")
+        .style("background-color", "white")
+        .style("border", "solid")
+        .style("border-width", "2px")
+        .style("border-radius", "5px")
+        .style("padding", "5px");
+
+      // hover 事件
+      dots
+        .on("mouseover", function () {
+          tooltips.style("opacity", 1); // 顯示 tooltip
+        })
+        .on("mousemove", function (d) {
+          let pt = d3.pointer(event, this); // 抓圓點位置
+          tooltips
+            .style("opacity", 1)
+            .style("left", pt[0] + 30 + "px") // 設定 tooltips 位置
+            .style("top", pt[1] + "px")
+            .html(`圓半徑： ${d.target.__data__.r}`); // 抓到綁定在DOM元素的資料
+        })
+        .on("mouseleave", function () {
+          //設定滑鼠離開時 tooltips 隱藏
+          tooltips.style("opacity", 0);
+        });
+    </script>
+  </body>
+</html>

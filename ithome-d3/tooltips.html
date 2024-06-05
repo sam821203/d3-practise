@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <div class="tooltip1" style="border: 1px solid tomato"></div>
+
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <script>
+      // Tooltips 基礎設定 =================================================================
+      const svg = d3
+        .select(".tooltip1")
+        .append("svg")
+        .attr("width", 300)
+        .attr("height", 300);
+
+      // 圓點
+      svg
+        .append("circle")
+        .attr("id", "dot")
+        .attr("cx", 150)
+        .attr("cy", 150)
+        .attr("r", 40)
+        .attr("fill", "skyblue");
+
+      // 建立 tooltips
+      const tooltip = d3
+        .select(".tooltip1")
+        .append("div")
+        .style("position", "absolute")
+        .style("visibility", "hidden") // 一開始tooltips是隱藏的
+        .style("background-color", "white")
+        .style("border", "solid")
+        .style("border-width", "1px")
+        .style("border-radius", "5px")
+        .style("padding", "10px")
+        .html(
+          "<p>我是tooltip！</p>" +
+            "<p>這邊可以隨意放入任何想放的資料</p>" +
+            "<img src='https://github.com/holtzy/D3-graph-gallery/blob/master/img/section/ArcSmal.png?raw=true'></img>" +
+            "<p>甚至圖片也可以唷</p>"
+        );
+
+      // 加上滑鼠事件
+      d3.select("#dot")
+        .style("cursor", "pointer")
+        .on("mouseover", function () {
+          return tooltip.style("visibility", "visible");
+        })
+        .on("mousemove", function () {
+          // 設定 tooltip 位置
+          return tooltip.style("top", "250px").style("left", "280px");
+        })
+        .on("mouseleave", function () {
+          return tooltip.style("visibility", "hidden");
+        });
+    </script>
+  </body>
+</html>
