@@ -44,6 +44,23 @@
         .style("cursor", "pointer");
 
       // 建立拖曳方法
+      const drag = d3
+        .drag()
+        .on("start", function () {
+          console.log(this);
+          d3.select(this).style("stroke", "blue");
+        })
+        .on("drag", function () {
+          let pt = d3.pointer(event, this);
+
+          d3.select(this).attr("cx", pt[0]).attr("cy", pt[1]);
+        })
+        .on("end", function () {
+          d3.select(this).style("stroke", "#b3a2c8");
+        });
+
+      // 呼叫 drag 事件
+      dots.call(drag);
     </script>
   </body>
 </html>
