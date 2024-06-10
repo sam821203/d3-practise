@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <div class="zoom1" style="border: 1px solid tomato"></div>
+    <div class="zoom2" style="border: 1px solid tomato"></div>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+
+    <script>
+      // 範例一：Zoom 基礎範例 =================================================================
+      const basicZoom = () => {
+        const width = 500;
+        const height = 300;
+
+        const svg = d3
+          .select(".zoom1")
+          .append("svg")
+          .attr("width", width)
+          .attr("height", height);
+
+        // 加個圓點點
+        const circle = svg
+          .append("circle")
+          .attr("id", "dot")
+          .attr("cx", 150)
+          .attr("cy", 150)
+          .attr("r", 40)
+          .attr("fill", "#69b3a2");
+
+        // Zoom 事件
+        const zoom = d3
+          .zoom()
+          // 限定 viewport 視窗範圍
+          .extent([
+            [0, 0],
+            [250, 250],
+          ])
+          // 限制縮放大小範圍
+          .scaleExtent([0, 5])
+          // 設定雙擊的動畫時長
+          .duration(600)
+          // 用 on 來監聽縮放事件啟動後，要進行什麼動作
+          .on("zoom", function (event) {
+            console.log(event);
+            //這邊決定要放大誰，我想放大 circle
+            circle.attr("transform", event.transform);
+          });
+
+        // 用 selection.call 呼叫 zoom 方法
+        svg
+          .call(zoom)
+          // 設定滑鼠滾輪滾動時，不要進行縮放
+          .on("wheel.zoom", null);
+      };
+
+      basicZoom();
+
+      // 範例二：Input 調整 zoom 縮放比例 =================================================================
+      const inputZoom = () => {
+        const width = 500;
+        const height = 400;
+
+        const svg = d3
+          .select(".zoom2")
+          .append("svg")
+          .attr("width", width)
+          .attr("height", height);
+
+        // 加個圓點點
+        const circle = svg
+          .append("circle")
+          .attr("id", "dot")
+          .attr("cx", 150)
+          .attr("cy", 150)
+          .attr("r", 40)
+          .attr("fill", "#69b3a2");
+
+        // Zoom 事件
+        const zoom = d3.zoom().on("zoom", function (event) {
+          circle.attr("transform", event.transform);
+        });
+
+        svg.call(zoom);
+
+        // 加上 reset button
+        const resetBtn = d3
+          .select(".zoom2")
+          .append("div")
+          .append("button")
+          .attr("class", "btn btn-primary")
+          .attr("id", "reset")
+          .text("reset");
+
+        // reset button 觸發
+        resetBtn.on("click", function () {
+          const transform = d3.zoomIdentity.scale(1);
+
+          svg.call(zoom.transform, transform);
+        });
+
+        // 做輸入縮放數值的功能
+        // input 輸入 Zoom 的大小
+        const div = d3.select(".zoom2").append("div");
+        const zoomScaleInput = div.append("input").attr("id", "zoomscale");
+        const zoomScaleBtn = div.append("button").text("執行");
+
+        // 設定取 value 的值，套用 zoom 的倍數
+        zoomScaleBtn.on("click", function () {
+          const scaleValue = document.getElementById("zoomscale").value;
+          const transform = d3.zoomIdentity.scale(`${scaleValue}`);
+          svg.call(zoom.transform, transform);
+        });
+      };
+
+      inputZoom();
+    </script>
+  </body>
+</html>
