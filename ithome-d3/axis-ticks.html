@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Document</title>
+        <style>
+            g.dashed path {
+              display: none;
+            }
+
+            g.dashed line {
+              stroke-dasharray: 1 1;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="demo1" style="width: 500px; border: 1px solid tomato"></div>
+        <div class="demoDashed" style="width: 500px; border: 1px solid tomato"></div>
+        <div class="XY_Axis" style="width: 500px; border: 1px solid tomato"></div>
+
+        <script src="https://d3js.org/d3.v7.min.js"></script>
+
+        <script>
+            // 實際範例 =================================================================
+            const initDemo1 = () => {
+              let width = 500
+              let height = 200
+              let margin = 10
+
+              d3.select('.demo1')
+                .append('svg')
+                .attr('width', width)
+                .attr('height', height)
+                .append('g')
+                .attr('transform', `translate(${margin}, ${height - (margin * 2)})`)
+
+              // 設定比例尺
+              const scale = d3.scaleLinear()
+                .domain([0, 100])
+                .range([0, `${width - (margin * 2)}`])
+
+              // 建立軸線
+              let axis = d3.axisTop(scale).tickSize(30).tickSizeOuter(60).tickPadding(60)
+
+              axis.tickValues([0, 25, 53, 68, 81, 95, 100])
+              axis.tickFormat(function(d) {
+                return d + '元'
+              })
+
+              d3.select('svg g')
+                .call(axis)
+            }
+
+            initDemo1()
+
+            // 虛線段的軸線 =================================================================
+            const initDemo2 = () => {
+              let scale2 = d3.scaleLinear()
+                .domain([0, 100])
+                .range([0, 400])
+
+              let axis2 = d3.axisRight(scale2)
+                // 把 tick 的尺寸設定成跟 range 的最大值一樣，就能得到滿版的軸線
+                .tickSize(400)
+
+              d3.select('.demoDashed')
+                .append('svg')
+                .attr('width', 500)
+                .attr('height', 400)
+                .append('g')
+                .attr('class', 'dashed')
+                .attr('transform', 'translate(20, 20)')
+                .call(axis2);
+            }
+
+            initDemo2()
+
+            // XY 軸範例 =================================================================
+            const initDemoboard = () => {
+              const svg = d3.select(".XY_Axis")
+                .append('svg')
+                .attr('width', 500)
+                .attr('height', 200)
+
+              const data = [{x:100, y:20}, {x:18, y:30}, {x:90, Y:250}]
+
+              // map 資料集
+              xData = data.map((i) => i.x)
+              yData = data.map((i) => i.y)
+
+              // 設定要給 X 軸用的 scale 跟 axis ====================
+              const xScale = d3.scaleLinear()
+                .domain([0, d3.max(xData)])
+                // X 軸繪製的 viewport 起點終點(寬度)
+                .range([20, 480])
+
+              const xAxis = d3.axisBottom(xScale)
+                .tickFormat(function (d) {
+                  // 調整標籤樣式
+                  return `${d} 元`
+                })
+
+              // 呼叫繪製 X 軸、調整 X 軸位置
+              const xAxisGroup = svg.append('g')
+                .call(xAxis)
+                .attr('transform', 'translate(0,180)')
+
+              // 設定要給 Y 軸用的 scale 跟 axis ====================
+              const yScale = d3.scaleLinear()
+                .domain([0, d3.max(yData)])
+                // Y 軸繪製的 viewport 起點終點(高度)
+                .range([180, 20])
+
+              const yAxis = d3.axisLeft(yScale)
+                .ticks(5)
+
+              // 呼叫繪製 y 軸、調整 y 軸位置
+              const yAxisGroup = svg.append('g')
+                .call(yAxis)
+                .attr('transform', 'translate(20, 0)')
+            }
+
+            initDemoboard()
+        </script>
+    </body>
+</html>

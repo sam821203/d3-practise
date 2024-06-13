@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Document</title>
+        <style>
+            .RWDChart{
+              width: 80%
+            }
+        </style>
+    </head>
+    <body>
+        <h4 class="mt-3">1. 固定寬高的圖表</h4>
+        <div class="simpleChart"></div>
+
+        <h4 class="mt-3">2. 響應式圖表</h4>
+        <div class="RWDChart"></div>
+        <script src="https://d3js.org/d3.v7.min.js"></script>
+
+        <script>
+            // 實際範例 =================================================================
+            const width = 500;
+            const height = 400;
+
+            const svg = d3.select('.simplateChart')
+              .append('svg')
+              .attr('width', width)
+              .attr('height', height);
+
+            const rwdSvgWidth = parseInt(d3.select('.RWDChart').style('width'))
+            const rwdSvgHeight = rwdSvgWidth*0.8
+            const margin = 30
+            const  bandWidth = 20
+        </script>
+    </body>
+</html>
