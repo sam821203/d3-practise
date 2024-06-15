@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <style>
+      .chartContainer {
+        margin: auto;
+        width: 80%;
+        min-width: 200px;
+        /* height: 600px; */
+        margin: auto;
+      }
+    </style>
+  </head>
+  <body>
+    <h4 class="text-center mt-5">金金的帳本</h4>
+    <div class="chartContainer"></div>
+    <div>
+      <button type="button" class="January">1月</button>
+      <button type="button" class="February">2月</button>
+    </div>
+
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+
+    <script>
+      // 實際範例 =================================================================
+      // Data
+      let data = [
+        { item: "交通", data: 30 },
+        { item: "房租", data: 45 },
+        { item: "其他", data: 9 },
+        { item: "吃飯", data: 67 },
+        { item: "娛樂", data: 22 },
+      ];
+
+      // 切換一二月資料
+      d3.select(".February").on("click", function () {
+        data = [
+          { item: "交通", data: 50 },
+          { item: "房租", data: 65 },
+          { item: "其他", data: 39 },
+          { item: "吃飯", data: 17 },
+          { item: "娛樂", data: 72 },
+        ];
+        drawPie();
+      });
+
+      d3.select(".January").on("click", function () {
+        data = [
+          { item: "交通", data: 30 },
+          { item: "房租", data: 45 },
+          { item: "其他", data: 9 },
+          { item: "吃飯", data: 67 },
+          { item: "娛樂", data: 22 },
+        ];
+        drawPie();
+      });
+
+      // 開始畫圓餅圖
+      const drawPie = () => {
+        // RWD 清除原本的圖型
+        d3.select("svg").remove();
+
+        // svg圖形區大小、邊界
+        const svgWidth = parseInt(d3.select(".chartContainer").style("width")),
+          svgHeight = svgWidth * 0.8,
+          margin = 40;
+
+        // 先設定 svg 大小
+        const svg = d3
+          .select(".chartContainer")
+          .append("svg")
+          .attr("width", svgWidth)
+          .attr("height", svgHeight);
+
+        // 圖表與線條、標籤
+        svg
+          .append("g")
+          .attr("class", "slices")
+          .attr("transform", `translate(${svgWidth / 2}, ${svgHeight / 2})`);
+        svg.append("g").attr("class", "labels");
+        svg.append("g").attr("class", "lines");
+
+        // 設定顏色
+        const color = d3
+          .scaleOrdinal()
+          .range(["#4BEFCF", "#0bbc17", "#F96262", "#ffbe32", "#e271fc"]);
+        // const color = d3.scaleOrdinal()
+        //                 .domain(data.map(d=>d.item))
+        //                 .range(d3.schemeSet3.reverse());
+
+        // radius 用來設定半徑，圓餅圖的圓弧大小是區域的一半
+        const radius = Math.min(svgWidth, svgHeight) / 2 - margin;
+
+        // 設定每個資料在圓餅圖上:
+        const piechart = d3
+          .pie()
+          .value((d) => d.data)
+          .sort(function (a, b) {
+            console.log(a, b); // 固定圓餅圖的項目排序
+            return d3.ascending(a.key, b.key);
+          });
+
+        // innerRadius 跟 outerRadius 決定圓餅內圈外圈的大小 radius
+        const arc = d3.arc().innerRadius(0).outerRadius(radius).padAngle(0.02),
+          outerArc = d3
+            .arc()
+            .outerRadius(radius * 0.9)
+            .innerRadius(radius * 0.9),
+          data_ready = piechart(data);
+
+        // 計算每塊資料的占比%
+        // 先用 d3.sum 加總全部資料，再將資料一一除上總數
+        const total = d3.sum(data, (d) => d.data);
+        data.forEach((d) => {
+          d.percentage = Math.round((d.data / total) * 100);
+        });
+        // 建立pie
+        const cutePie = svg
+          .select(".slices")
+          .selectAll("g")
+          .data(data_ready)
+          .enter()
+          .append("g")
+          .attr("class", "arc");
+
+        cutePie
+          .append("path")
+          .attr("d", arc)
+          .attr("fill", color)
+          .attr("stroke", "#fff")
+          .style("stroke-width", "2px")
+          .style("opacity", 1);
+
+        // 加上每個區塊的標示
+        // 控制文字的位置
+        const arcText = d3
+          .arc()
+          .innerRadius(radius)
+          .outerRadius(radius - 10);
+
+        const itemText = cutePie
+          .append("text")
+          .attr("transform", (d) => `translate(${arcText.centroid(d)})`)
+          .text((d) => d.data.item + d.data.percentage + "%")
+          .style("text-anchor", "middle")
+          .style("font-size", 16)
+          .style("fill", "black");
+
+        // 滑鼠互動 mouseover、mouseleave
+        d3.selectAll(".arc path")
+          .style("cursor", "pointer")
+          .on("mouseover", function () {
+            d3.select(this)
+              .transition()
+              .duration(500)
+              .style("filter", "drop-shadow(2px 4px 6px black)")
+              .style("transform", "scale(1.1)");
+          })
+          .on("mouseleave", function () {
+            d3.select(this)
+              .transition()
+              .duration(500)
+              .style("filter", "drop-shadow(0 0 0 black)")
+              .style("transform", "scale(1)");
+          });
+      };
+
+      drawPie();
+
+      // RWD
+      d3.select(window).on("resize", drawPie);
+    </script>
+  </body>
+</html>
