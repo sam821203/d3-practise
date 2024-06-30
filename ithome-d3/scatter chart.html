@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <style>
+      .scatter1,
+      .scatter2 {
+        margin: auto;
+        width: 80%;
+        min-width: 300px;
+      }
+      .axis path,
+      .axis line {
+        fill: none;
+        stroke: black;
+        shape-rendering: crispEdges;
+      }
+
+      circle:hover {
+        cursor: pointer;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="scatter1 m-auto"></div>
+    <div class="scatter2 m-auto"></div>
+
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+
+    <script>
+      const scatter1 = (data) => {
+        // RWD 清除原本的圖型
+        d3.select(".scatter1").select("svg").remove();
+
+        // 建立 svg
+        const svgWidth = parseInt(d3.select(".scatter1").style("width"));
+        const svgHeight = svgWidth;
+        const margin = 50;
+        const svg = d3
+          .select(".scatter1")
+          .append("svg")
+          .attr("width", svgWidth)
+          .attr("height", svgHeight);
+
+        // 建立 X 軸線
+        const xScale = d3
+          .scaleLinear()
+          .domain([0, 4000])
+          .range([0, svgWidth - margin * 2]);
+
+        const xAxis = d3.axisBottom(xScale);
+
+        svg
+          .append("g")
+          .attr("transform", `translate(${margin}, ${svgHeight - margin / 2})`)
+          .call(xAxis);
+
+        // 建立 Y 軸線
+        const yScale = d3
+          .scaleLinear()
+          .domain([0, 500000])
+          .range([svgHeight - margin, 0]);
+
+        const yAxis = d3.axisLeft(yScale).tickFormat((d) => "$" + d);
+
+        svg
+          .append("g")
+          .attr("transform", `translate(${margin}, ${margin / 2})`)
+          .call(yAxis);
+
+        // 把資料綁定到 <circle> 上
+        // 把特定範圍的資料設定成不同顏色
+        svg
+          .append("g")
+          .selectAll("dot")
+          .data(data)
+          .enter()
+          .append("circle")
+          .attr("cx", (d) => xScale(d.GrLivArea))
+          .attr("cy", (d) => yScale(d.SalePrice))
+          .attr("r", 1.5)
+          // 將大於 129000 的點點都變成粉紅色
+          .style("fill", (d) => {
+            return d.SalePrice > 129000 ? "pink" : "#69b3a2";
+          });
+      };
+
+      const getData = async () => {
+        let dataGet;
+        const cors = "https://secret-ocean-49799.herokuapp.com/";
+        const url = "./userContent.csv";
+
+        dataGet = await d3.csv(`${url}`);
+        scatter1(dataGet);
+      };
+
+      getData();
+
+      // 範例二的畫面與互動效果
+      // mouseover 時點點變色 + tooltip
+      const handleMouseOver = (d, i) => {
+        // 選定 this 的元素，改變 hover 過去的顏色跟形狀
+        d3.select(this)
+          .attr("fill", "orange")
+          .attr("r", radius * 2);
+
+        // 加上 tooltips
+        let pt = d3.pointer(event, this);
+
+        svg
+          .append("text")
+          .attr("class", "hoverTextInfo")
+          .attr("x", pt[0] + 10)
+          .attr("y", pt[1] - 10)
+          .style("fill", "red")
+          .text([`x: ${d.x}, y:${d.y}`]);
+      };
+
+      // mouseleave 時變回原樣
+      const handleMouseOut = (d, i) => {
+        d3.selectAll(".hoverTextInfo").remove();
+        d3.select(this).attr("fill", "black").attr("r", radius);
+      };
+
+      const scatter2 = () => {
+        // RWD 清除原本的圖型
+        d3.select(".scatter2").select("svg").remove();
+
+        // 建立svg
+        let w = parseInt(d3.select(".scatter2").style("width"));
+        let h = w * 0.8;
+        let margin = {
+          top: 40,
+          right: 20,
+          bottom: 20,
+          left: 40,
+        };
+        let radius = 5;
+        let svg = d3
+          .select(".scatter2")
+          .append("svg")
+          .attr("width", w)
+          .attr("height", h);
+        let dataset = [
+          { x: 100, y: 110 },
+          { x: 83, y: 43 },
+          { x: 92, y: 28 },
+          { x: 49, y: 74 },
+          { x: 51, y: 10 },
+          { x: 25, y: 98 },
+          { x: 77, y: 30 },
+          { x: 20, y: 83 },
+          { x: 11, y: 63 },
+          { x: 4, y: 55 },
+          { x: 0, y: 0 },
+          { x: 85, y: 100 },
+          { x: 60, y: 40 },
+          { x: 70, y: 80 },
+          { x: 10, y: 20 },
+          { x: 40, y: 50 },
+          { x: 25, y: 31 },
+        ];
+
+        // 建立 Ｘ 比例尺與軸線
+        const xScale = d3.scaleLinear().domain([
+          0,
+          d3
+            .max(dataset, (d) => {
+              return d.x + 10;
+            })
+            .range([margin.left, w - margin.right]),
+        ]);
+
+        const xAxis = d3.axisTop().scale(xScale);
+
+        const xAxisLine = svg
+          .append("g")
+          .attr("class", "xAxis")
+          .attr("transform", `translate(0, ${margin.top})`)
+          .call(xAxis);
+
+        // 建立 Ｙ 比例尺與軸線
+        const yScale = d3.scaleLinear().domain([
+          0,
+          d3
+            .max(dataset, (d) => {
+              return d.y + 10;
+            })
+            .range([margin.top, h - margin.bottom]),
+        ]);
+
+        const yAxis = d3.axisLeft().scale(yScale);
+
+        const yAxisLine = svg
+          .append("g")
+          .attr("class", "yAxis")
+          .attr("transform", `translate(${margin.left}, 0)`)
+          .call(yAxis);
+
+        // 把資料綁定到 <circle> 上
+        svg
+          .selectAll("circle")
+          .data(dataset)
+          .enter()
+          .append("circle")
+          .attr("cx", (d) => {
+            return xScale(d.x);
+          })
+          .attr("cy", (d) => {
+            return yScale(d.y);
+          })
+          .attr("r", 5)
+          .attr("fill", "#000")
+          .on("mouseover", handleMouseOver)
+          .on("mouseout", handleMouseOut);
+      };
+
+      svg.on("click", () => {
+        let coords = d3.pointer(event, this);
+        let newData = {
+          // 把 XY 座標軸轉換成資料
+          x: Math.round(xScale.invert(coords[0])),
+          y: Math.round(yScale.invert(coords[1])),
+        };
+      });
+
+      // 將增加的資料座標推入原本的data
+      dataset.push(newData);
+
+      scatter1();
+      scatter2();
+
+      // RWD
+      d3.select(window).on("resize", scatter1());
+      d3.select(window).on("resize", scatter2());
+    </script>
+  </body>
+</html>
